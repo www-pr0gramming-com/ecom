@@ -5,9 +5,12 @@ from django.conf.urls.static import static
 
 from django.views.generic import TemplateView
 
+from app import views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", TemplateView.as_view(template_name="home.html")),
+    path("contact/", views.ContactView.as_view(), name="contact"),
 ]
 
 
