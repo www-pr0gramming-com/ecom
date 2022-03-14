@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
 
 {% block content %}
 
@@ -32,6 +34,22 @@
 
                         </div>
                     </div>
+
+                    <hr>
+
+                    <div class="m-2">
+
+                        <form action="." method="POST">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" type="submit">Add Cart</button>
+                            </div>
+
+                        </form>
+                    </div>
+
                 </div>
             </div>
 
