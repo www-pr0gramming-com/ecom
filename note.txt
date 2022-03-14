@@ -1,0 +1,21 @@
+product list
+
+|
+
+product detail
+
+|
+
+cart view
+
+|
+
+checkout
+
+|
+
+payment
+
+|
+
+thank you
