@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+<style>
+    .feature-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        margin-bottom: 1rem;
+        font-size: 2rem;
+        color: #fff;
+        border-radius: .75rem;
+    }
+</style>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">image</th>
+            <th scope="col">product</th>
+            <th scope="col">price</th>
+            <th scope="col">quantity</th>
+            <th scope="col">total</th>
+            <th scope="col">action</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for item in order.items.all %}
+        <tr>
+            <td>
+                <img src="{{ item.product.image.url }}" class="feature-icon m-2">
+            </td>
+            <td>
+                <h5 class="h5 text-black m-2">{{ item.product.title }}</h5>
+                <small>Size: {{ item.size.name }}</small>
+                <small>Color: {{ item.color.name }}</small>
+            </td>
+            <td>$ 0</td>
+            <td>
+                <div class="input-group m-2" style="max-width: 120px;">
+                    <div class="input-group-prepend">
+                        <a href="/" class="btn btn-outline-primary">
+                            &minus;
+                        </a>
+                    </div>
+                    <input type="text" class="form-control text-center" value="{{ item.quantity }}">
+                    <div class="input-group-append">
+                        <a href="/" class="btn btn-outline-primary">
+                            &plus;
+                        </a>
+                    </div>
+                </div>
+            </td>
+            <td>
+                $ 0
+            </td>
+            <td>
+                <a href="/" class="btn btn-primary btn-sm m-2">X</a>
+            </td>
+        </tr>
+
+        {% empty %}
+
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+{% endblock content %}
