@@ -1,4 +1,6 @@
 {% load static i18n %}
+{% load cart_template_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,6 +32,29 @@
 
 <body>
 
+    <style>
+        .CartBadge {
+            position: relative;
+        }
+
+        .CartBadge[data-badge]:after {
+            content: attr(data-badge);
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            font-size: .7em;
+            background: rgb(226, 34, 94);
+            color: white;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            border-radius: 50%;
+            box-shadow: 0 0 1px #333;
+        }
+    </style>
+
+
     <div class="mb-1">
         <nav class="navbar navbar-expand-md navbar-light bg-light">
             <div class="container-fluid">
@@ -57,7 +82,8 @@
 
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'cart:cart' %}">
-                                <i class="fa-solid fa-cart-shopping"></i>
+                                <i class="CartBadge fa-solid fa-cart-shopping"
+                                    data-badge="{{ request|cart_item_count }}"></i>
                             </a>
                         </li>
 

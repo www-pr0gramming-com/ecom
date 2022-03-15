@@ -97,6 +97,23 @@ class Order(models.Model):
     def reference_number(self):
         return f"ORDER-{self.pk}"
 
+    def get_subtatal(self):
+        total = 0
+        for order_items in self.items.all():
+            total += order_items.get_total_item_price()
+
+        return total
+
+    def get_raw_total(self):
+        subtotal = self.get_subtatal()
+
+        tax = 0
+        delivery = 0
+
+        total = subtotal + tax + delivery
+
+        return total
+
 
 class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="payments")
