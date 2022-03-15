@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+
+<div class="container my-5 py-5">
+
+    <h1>checkout : {{ object.name }}</h1>
+
+    <hr>
+
+    {% if not request.user.is_authenticated %}
+
+    <div class="card">
+        <div class="card-header">
+            Login or SignUp
+        </div>
+        <div class="card-body">
+
+            <div class="d-grid gap-2">
+                <a href="#" class="btn btn-primary">Login</a>
+            </div>
+
+            <hr>
+
+            <div class="d-grid gap-2">
+                <a href="#" class="btn btn-primary">SignUp</a>
+            </div>
+
+        </div>
+    </div>
+
+    {% else %}
+
+    <div class="card">
+        <div class="card-header">
+            Details
+        </div>
+
+        <div class="card-body">
+
+            {% for item in order.items.all %}
+            <p>
+                {{ item.size.name }}, {{ item.color.name }} {{ item.product.title }}
+                <strong class="mx-2">x</strong> {{ item.quantity }} - ${{ item.get_total_item_price }}
+            </p>
+
+            <hr>
+            {% endfor %}
+
+
+            <form method="POST" action=".">
+                {% csrf_token %}
+                {{ form|crispy }}
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary mb-3" type="submit">Next</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+
+{% endblock content %}
