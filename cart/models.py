@@ -41,6 +41,7 @@ class Product(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField()
     image = models.ImageField(upload_to="product_images/")
+    price = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=False)
@@ -63,6 +64,9 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.title}"
+
+    def get_total_item_price(self):
+        return self.quantity * self.product.price
 
 
 class Order(models.Model):

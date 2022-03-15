@@ -42,7 +42,7 @@
                 <small>Size: {{ item.size.name }}</small>
                 <small>Color: {{ item.color.name }}</small>
             </td>
-            <td>$ 0</td>
+            <td>&yen; {{ item.product.price }}</td>
             <td>
                 <div class="input-group m-2" style="max-width: 120px;">
                     <div class="input-group-prepend">
@@ -59,7 +59,7 @@
                 </div>
             </td>
             <td>
-                $ 0
+                &yen; {{ item.get_total_item_price }}
             </td>
             <td>
                 <a href="/" class="btn btn-primary btn-sm m-2">X</a>
