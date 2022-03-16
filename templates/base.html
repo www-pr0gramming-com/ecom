@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>{% block title %}Main{% endblock title %}</title>
+    <title>{% block title %}Main{% endblock title %} - {% block head_title %}{% endblock head_title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="icon" href="/">
@@ -79,6 +79,33 @@
                                 <span class="visually-hidden">(current)</span>
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">Profile
+                                <span class="visually-hidden">(current)</span>
+                            </a>
+                        </li>
+
+                        {% if not request.user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_login' %}">Login
+                                <span class="visually-hidden">(current)</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_signup' %}">Sign up
+                                <span class="visually-hidden">(current)</span>
+                            </a>
+                        </li>
+
+                        {% elif request.user.is_authenticated %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_logout' %}">Logout
+                                <span class="visually-hidden">(current)</span>
+                            </a>
+                        </li>
+                        {% endif %}
 
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'cart:cart' %}">

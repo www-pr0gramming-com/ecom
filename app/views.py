@@ -8,6 +8,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from cart.models import Order
+
 
 class ContactView(generic.FormView):
     form_class = ContactForm
@@ -37,3 +41,14 @@ class ContactView(generic.FormView):
         )
 
         return super(ContactView, self).form_valid(form)
+
+
+class ProfileView(LoginRequiredMixin, generic.TemplateView):
+    template_name = "profile.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileView, self).get_context_data(**kwargs)
+        context.update(
+            {"orders": Order.objects.filter(user=self.request.user, ordered=True)}
+        )
+        return context
