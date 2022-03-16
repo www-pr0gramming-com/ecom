@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+
+<div class="container my-5 py-5">
+
+
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="alert alert-primary" style="display: none;" id="alertSuccess" role="alert">
+                Success
+            </div>
+
+            <div class="alert alert-primary" style="display: none;" id="alertFailure" role="alert">
+                Error
+            </div>
+
+            <div class="spinner-border" style="display: none;" id="loader" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+
+
+            <div id="paypal-button-container"></div>
+
+        </div>
+    </div>
+
+</div>
+
+{% csrf_token %}
+{% endblock content %}
+
+
+{% block inline_javascript %}
+
+<script src="https://www.paypal.com/sdk/js?client-id={{PAYPAL_CLIENT_ID}}&currency=JPY"></script>
+
+
+<script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    const loader = document.getElementById('loader');
+
+    function toggleLoader(on) {
+        loader.style.display = on === true ? "block" : "none";
+    }
+
+    function sendOrderConfirmed(orderData) {
+        return fetch("{% url 'cart:confirm-order' %}", {
+            method: "post",
+            body: JSON.stringify(orderData),
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken
+            }
+        })
+    }
+
+
+    paypal.Buttons({
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: '{{ order.get_raw_total }}'
+                    }
+                }]
+            });
+        },
+
+
+        // Finalize the transaction after payer approval
+        onApprove: function (data, actions) {
+            toggleLoader(true);
+
+            return actions.order.capture().then(function (orderData) {
+
+                sendOrderConfirmed(orderData).then(res => {
+
+                        const alertSuccess = document.getElementById('alertSuccess');
+                        alertSuccess.style.display = 'block';
+
+                        setTimeout(function () {
+                            window.location.replace("{{ URL }}")
+                        }, 3000);
+
+                        toggleLoader(false);
+
+
+                    })
+                    .catch(err => {
+                        const alertFailure = document.getElementById('alertFailure');
+                        alertFailure.style.display = 'block';
+                    })
+                    .finally(() => toggleLoader(false));
+
+                //console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                //var transaction = orderData.purchase_units[0].payments.captures[0];
+                // alert('Transaction ' + transaction.status + ': ' + transaction.id +
+                //'\n\nSee console for all available details');
+                // var element = document.getElementById('paypal-button-container');
+                // element.innerHTML = ''; 
+                // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                // Or go to another URL:  actions.redirect('thank_you.html');
+            });
+
+        }
+
+    }).render('#paypal-button-container');
+</script>
+{% endblock inline_javascript%}
