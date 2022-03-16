@@ -25,12 +25,12 @@ class AddToCartForm(forms.ModelForm):
 class AddressForm(forms.Form):
 
     sname = forms.CharField(required=False)
-    shipping_zip_code = forms.CharField(required=False)
+    shipping_zip_code = forms.CharField(required=False, max_length=7)
     sadress = forms.CharField(required=False)
 
     ###################################
     bname = forms.CharField(required=False)
-    billing_zip_code = forms.CharField(required=False)
+    billing_zip_code = forms.CharField(required=False, max_length=7)
     badress = forms.CharField(required=False)
 
     ###################################
@@ -62,8 +62,11 @@ class AddressForm(forms.Form):
         if selected_shipping_address is None:
             if not self.cleaned_data.get("sname", None):
                 self.add_error("sname", "empty")
-            if not self.cleaned_data.get("shipping_zip_code", None):
+
+            shipping_zip_code = self.cleaned_data.get("shipping_zip_code", None)
+            if not len(shipping_zip_code) == 7:
                 self.add_error("shipping_zip_code", "empty")
+
             if not self.cleaned_data.get("sadress", None):
                 self.add_error("sadress", "empty")
 
@@ -75,8 +78,11 @@ class AddressForm(forms.Form):
         if selected_billing_address is None:
             if not self.cleaned_data.get("bname", None):
                 self.add_error("bname", "empty")
-            if not self.cleaned_data.get("billing_zip_code", None):
+
+            billing_zip_code = self.cleaned_data.get("billing_zip_code", None)
+            if not len(billing_zip_code) == 7:
                 self.add_error("billing_zip_code", "empty")
+
             if not self.cleaned_data.get("badress", None):
                 self.add_error("badress", "empty")
 
