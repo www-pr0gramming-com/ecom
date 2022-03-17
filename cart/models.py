@@ -62,6 +62,7 @@ class Product(models.Model):
         on_delete=models.SET_NULL,
     )
     secondary_categories = models.ManyToManyField(Category, blank=True)
+    stock = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -74,6 +75,10 @@ class Product(models.Model):
 
     def get_delete_url(self):
         return reverse("staff:product-delete", kwargs={"pk": self.pk})
+
+    @property
+    def in_stock(self):
+        return self.stock > 0
 
 
 class OrderItem(models.Model):

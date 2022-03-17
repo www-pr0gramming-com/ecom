@@ -39,6 +39,10 @@
 
                     <div class="m-2">
 
+                        {% if product.in_stock %}
+
+                        <h4>Stock: {{ product.stock }}</h4>
+
                         <form action="." method="POST">
                             {% csrf_token %}
                             {{ form|crispy }}
@@ -48,6 +52,12 @@
                             </div>
 
                         </form>
+
+                        {% else %}
+
+                        <h2>No more available, {{ product.title }}</h2>
+
+                        {% endif %}
                     </div>
 
                 </div>

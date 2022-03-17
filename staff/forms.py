@@ -13,4 +13,5 @@ class ProductForm(forms.ModelForm):
             "price",
             "available_colors",
             "available_sizes",
+            "stock",
         ]
