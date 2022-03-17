@@ -8,6 +8,13 @@ from django.db.models.signals import pre_save
 from django.utils.text import slugify
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class Address(models.Model):
 
     ADDRESS_CHOICES = (("B", "billing"), ("S", "shipping"))
@@ -47,6 +54,14 @@ class Product(models.Model):
     active = models.BooleanField(default=False)
     available_colors = models.ManyToManyField(ColorVariation)
     available_sizes = models.ManyToManyField(SizeVariation)
+    primary_category = models.ForeignKey(
+        Category,
+        related_name="primary_products",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    secondary_categories = models.ManyToManyField(Category, blank=True)
 
     def __str__(self):
         return self.title

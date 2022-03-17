@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views import generic
 
-from cart.models import Address, Order, OrderItem, Payment, Product
+from cart.models import Address, Category, Order, OrderItem, Payment, Product
 from .utils import get_or_set_order_session
 from .forms import AddToCartForm, AddressForm
 
@@ -16,11 +16,32 @@ from django.contrib import messages
 from django.conf import settings
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 
 
 class ProductListView(generic.ListView):
     template_name = "cart/product_list.html"
-    queryset = Product.objects.all()
+
+    def get_queryset(self):
+        qs = Product.objects.all()
+
+        category = self.request.GET.get("category", None)
+
+        if category:
+            qs = qs.filter(
+                Q(primary_category__name=category)
+                | Q(secondary_categories__name=category)
+            )
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductListView, self).get_context_data(**kwargs)
+        context.update(
+            {
+                "categories": Category.objects.values_list("name", flat=True),
+            }
+        )
+        return context
 
 
 class ProductDetailView(generic.FormView):
