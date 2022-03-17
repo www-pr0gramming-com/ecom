@@ -11,6 +11,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("cart/", include("cart.urls", namespace="cart")),
+    path("staff/", include("staff.urls", namespace="staff")),
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
     path("contact/", views.ContactView.as_view(), name="contact"),
     path("profile/", views.ProfileView.as_view(), name="profile"),

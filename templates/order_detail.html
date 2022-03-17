@@ -27,16 +27,16 @@
                                 <tr>
                                     <td>{{ item.size.name }}, {{ item.color.name }} of {{ item.product.title }} x
                                         {{ item.quantity }}</td>
-                                    <td>${{ item.get_total_item_price }}</td>
+                                    <td>&yen;{{ item.get_total_item_price }}</td>
                                 </tr>
                                 {% endfor %}
                                 <tr>
                                     <td>Subtotal</td>
-                                    <td>${{ order.get_subtatal }}</td>
+                                    <td>&yen;{{ order.get_subtatal }}</td>
                                 </tr>
                                 <tr>
                                     <td>Total</td>
-                                    <td>${{ order.get_raw_total }}</td>
+                                    <td>&yen;{{ order.get_raw_total }}</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <h2 class="text-black">Staff</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        StaffUser: {{ request.user.email }}
+                    </h5>
+                    <hr />
+
+                    <a href="/">Products</a>
+                    <hr />
+
+                    <h5 class="card-title">Orders</h5>
+                    <div class="site-blocks-table">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Reference No.</th>
+                                    <th>Date</th>
+                                    <th>User</th>
+                                    <th>Amount</th>
+                                    <th>Payment Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td><a
+                                            href="{% url 'cart:order-detail' order.pk %}">#{{ order.reference_number }}</a>
+                                    </td>
+                                    <td>{{ order.ordered_date }}</td>
+                                    <td>{{ order.user.email }}</td>
+                                    <td>&yen;{{ order.get_raw_total }}</td>
+                                    <td>{% if order.ordered %}Paid{% else %}Not paid{% endif %}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4">No orders</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+                    {% if is_paginated %}
+                    <nav aria-label="...">
+                        <ul class="pagination">
+
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link">&laquo;</a>
+                            </li>
+                            {% endif %}
+
+                            {% for i in page_obj.paginator.page_range %}
+
+                            {% if page_obj.number == i %}
+                            <li class="page-item active" aria-current="page">
+                                <a class="page-link" href="?page={{ i }}">
+                                    {{ i }}
+                                </a>
+                            </li>
+                            {% elif i > page_obj.number|add:'-5' and i < page_obj.number|add:'5' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}">
+                                    {{ i }}
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link">&raquo;</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
