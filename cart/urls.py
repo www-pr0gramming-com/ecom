@@ -27,4 +27,5 @@ urlpatterns = [
     path("payemnt/", views.PaymentView.as_view(), name="payment"),
     path("thanks/", views.ThankYouView.as_view(), name="thanks"),
     path("confirm-order/", views.ConfirmOrderView.as_view(), name="confirm-order"),
+    path("order-detail/<pk>/", views.OrderDetailView.as_view(), name="order-detail"),
 ]

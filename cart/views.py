@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views import generic
 
-from cart.models import Address, OrderItem, Payment, Product
+from cart.models import Address, Order, OrderItem, Payment, Product
 from .utils import get_or_set_order_session
 from .forms import AddToCartForm, AddressForm
 
@@ -14,6 +14,8 @@ from django.contrib import messages
 
 
 from django.conf import settings
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class ProductListView(generic.ListView):
@@ -200,3 +202,9 @@ class ConfirmOrderView(generic.View):
         order.save()
 
         return JsonResponse({"data": "Success"})
+
+
+class OrderDetailView(LoginRequiredMixin, generic.DetailView):
+    template_name = "order_detail.html"
+    queryset = Order.objects.all()
+    context_object_name = "order"
