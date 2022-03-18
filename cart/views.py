@@ -1,11 +1,19 @@
 import datetime
 import json
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views import generic
 
-from cart.models import Address, Category, Order, OrderItem, Payment, Product
+from cart.models import (
+    Address,
+    Category,
+    Order,
+    OrderItem,
+    Payment,
+    Product,
+    StripePayment,
+)
 from .utils import get_or_set_order_session
 from .forms import AddToCartForm, AddressForm
 
@@ -17,6 +25,14 @@ from django.conf import settings
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+
+import stripe
+
+stripe.api_key = "sk_test_51JuBBUBQiGyA5MbMg18MgW2S3r5Cmnie1B8gPp5sMBcPySHEIVTwx4LeTeKHEz9FHAKrT7wLWaU6zWeZQJq1dAy200d52eeXkb"
+
+from django.views.decorators.csrf import csrf_exempt
+
+from django.utils import timezone
 
 
 class ProductListView(generic.ListView):
@@ -131,7 +147,7 @@ class RemoveFromCartView(generic.View):
         return redirect("cart:cart")
 
 
-class CheckoutView(generic.FormView):
+class CheckoutView(LoginRequiredMixin, generic.FormView):
     template_name = "cart/checkout.html"
     form_class = AddressForm
 
@@ -195,7 +211,6 @@ class PaymentView(generic.TemplateView):
         context = super(PaymentView, self).get_context_data(**kwargs)
         context["PAYPAL_CLIENT_ID"] = settings.PAYPAL_CLIENT_ID
         context["order"] = get_or_set_order_session(self.request)
-
         context["URL"] = self.request.build_absolute_uri(reverse("cart:thanks"))
         return context
 
@@ -229,3 +244,126 @@ class OrderDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = "order_detail.html"
     queryset = Order.objects.all()
     context_object_name = "order"
+
+
+class StripePaymentView(generic.TemplateView):
+    template_name = "cart/stripe_payment.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(StripePaymentView, self).get_context_data(**kwargs)
+        context["order"] = get_or_set_order_session(self.request)
+
+        return context
+
+
+class CreateCheckoutSessionView(LoginRequiredMixin, generic.View):
+    def post(self, request, *args, **kwargs):
+        order = get_or_set_order_session(self.request)
+        user = self.request.user
+
+        if not user.stripe_customer_id:
+            stripe_customer = stripe.Customer.create(email=user.email)
+            user.stripe_customer_id = stripe_customer["id"]
+            user.save()
+        ####################################################
+
+        if order.items.all().count() == 0 or order.shipping_address == None:
+            messages.error(self.request, "empty cart or no address")
+            return redirect("home")
+
+        ####################################################
+
+        domain = "https://domain.com"
+        if settings.DEBUG:
+            domain = "http://127.0.0.1:8000"
+
+        ####################################################
+
+        customer = request.user.stripe_customer_id
+
+        ####################################################
+
+        line_items = []
+
+        for item in order.items.all():
+            # product_image_url = domain + item.product.image.url
+            product_image_url = (
+                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg"
+            )
+            name = f"{item.product.title} x {item.quantity}, {item.color}, {item.size}"
+
+            line_item = {
+                "price_data": {
+                    "currency": "jpy",
+                    "product_data": {
+                        "name": name,
+                        "images": [product_image_url],
+                    },
+                    "unit_amount": item.product.price,
+                },
+                "quantity": item.quantity,
+            }
+            line_items.append(line_item)
+
+        ####################################################
+
+        try:
+            checkout_session = stripe.checkout.Session.create(
+                customer=customer,
+                line_items=line_items,
+                mode="payment",
+                success_url=domain + reverse("cart:thanks"),
+                cancel_url=domain + reverse("cart:product-list"),
+                metadata={
+                    "order_id": order.pk,
+                },
+            )
+        except Exception as e:
+            return str(e)
+
+        return redirect(checkout_session.url, code=303)
+
+
+@csrf_exempt
+def stripe_webhook(request, *args, **kwargs):
+    event = None
+    payload = request.body
+    sig_header = request.headers["STRIPE_SIGNATURE"]
+    endpoint_secret = "whsec_q7KPupyswGU1zfuoaia7j6eMKiUl0ORR"
+
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+
+    except ValueError as e:
+        # Invalid payload
+        print(e)
+        return HttpResponse(status=400)
+
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        print(e)
+        return HttpResponse(status=400)
+
+    # Handle the event
+    if event["type"] == "checkout.session.completed":
+        event = event["data"]["object"]
+
+        order = Order.objects.get(pk=int(event["metadata"]["order_id"]))
+
+        stripe_payment = StripePayment.objects.create(
+            order=order,
+            payment_method="Stripe",
+            successful=True,
+            amount=event["amount_total"],
+            response=event,
+        )
+
+        order = stripe_payment.order
+        order.ordered = True
+        order.ordered_date = timezone.now()
+        order.save()
+
+    else:
+        print("Unhandled event type {}".format(event["type"]))
+
+    return HttpResponse()

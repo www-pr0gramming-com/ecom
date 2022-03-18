@@ -30,7 +30,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "8383-89-187-161-88.ngrok.io"]
 
 
 # Application definition
@@ -170,6 +170,11 @@ NOTIFY_EMAIL = env("NOTIFY_EMAIL")
 
 PAYPAL_CLIENT_ID = env("PAPYPAL_SANDBOX_CLIENT_ID")
 PAYPAL_SECRET_KEY = env("PAPYPAL_SANDBOX_SECRET_KEY")
+
+
+STRIPE_PUBLIC_KEY = env("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")
+
 
 if DEBUG is False:
     SESSION_COOKIE_SECURE = True

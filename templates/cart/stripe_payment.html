@@ -1,13 +1,16 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+
+{% block javascript %}
+<script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock javascript %}
 
 
 {% block content %}
 
-
 <div class="container my-5 py-5">
 
-    <h1>checkout : {{ object.name }}</h1>
+    <h1>Stripe Payment</h1>
 
     <hr>
 
@@ -29,22 +32,18 @@
             {% endfor %}
 
 
-            <form method="POST" action=".">
+            <form action="{% url 'cart:create-checkout-session' %}" method="POST">
                 {% csrf_token %}
-                {{ form|crispy }}
-
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary mb-3" type="submit">Next</button>
-                </div>
+                <button type="submit" id="checkout-button">Checkout</button>
             </form>
+
 
         </div>
     </div>
 
 
-
-
 </div>
+
 
 
 

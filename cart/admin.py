@@ -8,6 +8,7 @@ from .models import (
     ColorVariation,
     SizeVariation,
     Payment,
+    StripePayment,
 )
 
 
@@ -29,3 +30,4 @@ admin.site.register(SizeVariation)
 admin.site.register(Address, AddressAdmin)
 admin.site.register(Payment)
 admin.site.register(Category)
+admin.site.register(StripePayment)

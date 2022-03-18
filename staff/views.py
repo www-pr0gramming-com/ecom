@@ -11,8 +11,8 @@ from .mixins import StaffUserMixin
 
 class StaffView(LoginRequiredMixin, StaffUserMixin, generic.ListView):
     template_name = "staff/staff.html"
-    queryset = Order.objects.filter(ordered=False).order_by("-ordered_date")
-    paginate_by = 1
+    queryset = Order.objects.filter(ordered=True).order_by("-ordered_date")
+    paginate_by = 20
     context_object_name = "orders"
 
 

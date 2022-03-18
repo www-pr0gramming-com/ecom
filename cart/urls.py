@@ -28,4 +28,11 @@ urlpatterns = [
     path("thanks/", views.ThankYouView.as_view(), name="thanks"),
     path("confirm-order/", views.ConfirmOrderView.as_view(), name="confirm-order"),
     path("order-detail/<pk>/", views.OrderDetailView.as_view(), name="order-detail"),
+    path("payment/stripe/", views.StripePaymentView.as_view(), name="payment-stripe"),
+    path(
+        "create-checkout-session/",
+        views.CreateCheckoutSessionView.as_view(),
+        name="create-checkout-session",
+    ),
+    path("webhook/stripe/", views.stripe_webhook),
 ]
